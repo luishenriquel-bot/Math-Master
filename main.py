@@ -1,7 +1,7 @@
 from http.server import SimpleHTTPRequestHandler
 import socketserver
 
-PORTAS = [8000, 8080, 5000, 5500]  # lista de portas possíveis
+PORTAS = [8000, 8080, 5000, 5500, 3000, 3500, 4000, 4500, 7000, 6000, 6500]  # lista de portas possíveis
 
 class MeuHandler(SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
