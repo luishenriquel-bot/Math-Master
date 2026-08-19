@@ -16,19 +16,8 @@ Math Master Evolution is an educational browser game designed to help students p
 10. A refill of 5 lives costs 50 gems.
 11. The game also includes combo, timer, XP progress, and player statistics.
 
-## How to play
 
-- Open the game in your browser.
-- Choose a lesson.
-- Answer the questions by typing the correct response.
-- Track progress, lives, gems, and challenges from the main menu.
 
-## How to run
+## Open the game here 👇:
 
-You can open the index.html file directly in the browser or use a simple Python server:
-
-```bash
-python main.py
-```
-
-Then open the address shown in the terminal.
+http://localhost:8000/
