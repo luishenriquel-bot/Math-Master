@@ -6,6 +6,155 @@ const app = document.getElementById("app");
 
 const PRACTICE_MODE_NO_LIFE_LOSS = true;
 
+const AUDIO_FILES = {
+    music: "música.mp3",
+    correct: "1.mp3",
+    wrong: "2.mp3",
+    victory: "3.mp3"
+};
+
+const SOUND_STORAGE_KEY = "mathmaster_sound_enabled";
+const audioCache = {};
+let soundEnabled = true;
+
+function getStoredSoundState() {
+    try {
+        const stored = localStorage.getItem(SOUND_STORAGE_KEY);
+        if (stored === null) return true;
+        return stored === "true";
+    } catch (error) {
+        return true;
+    }
+}
+
+function persistSoundState() {
+    try {
+        localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
+    } catch (error) {
+        // Ignora falhas de armazenamento.
+    }
+}
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    persistSoundState();
+
+    const btn = document.getElementById("sound-toggle");
+    if (btn) {
+        btn.textContent = soundEnabled ? "🔊 Som: ligado" : "🔇 Som: desligado";
+        btn.setAttribute("aria-pressed", String(soundEnabled));
+    }
+
+    if (soundEnabled) {
+        playBackgroundMusic();
+    } else {
+        stopBackgroundMusic();
+    }
+}
+
+function stopBackgroundMusic() {
+    const audio = getAudio(AUDIO_FILES.music);
+    if (!audio) return;
+
+    try {
+        audio.pause();
+        audio.currentTime = 0;
+    } catch (error) {
+        // Ignora falhas ao pausar a música.
+    }
+}
+
+function getAudio(url) {
+    if (!url) return null;
+
+    if (!audioCache[url]) {
+        try {
+            const audio = new Audio(url);
+            audio.preload = "auto";
+            audio.volume = 0.15;
+            audioCache[url] = audio;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    return audioCache[url];
+}
+
+function playAudio(src, volume = 0.15) {
+    const audio = getAudio(src);
+    if (!audio) return;
+
+    try {
+        audio.volume = Math.min(1, Math.max(0, Number(volume) || 0.15));
+        audio.currentTime = 0;
+        const playPromise = audio.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+            playPromise.catch(() => { });
+        }
+    } catch (error) {
+        // Ignora falhas de autoplay ou de navegador sem interromper o jogo.
+    }
+}
+
+function playBackgroundMusic() {
+    if (!soundEnabled) return;
+
+    const audio = getAudio(AUDIO_FILES.music);
+    if (!audio) return;
+
+    try {
+        audio.loop = true;
+        audio.volume = 0.12;
+        if (audio.paused) {
+            const playPromise = audio.play();
+            if (playPromise && typeof playPromise.catch === "function") {
+                playPromise.catch(() => { });
+            }
+        }
+    } catch (error) {
+        // Ignora falhas de execução do áudio.
+    }
+}
+
+function playEffectSound(type) {
+    const sounds = {
+        1: { file: AUDIO_FILES.correct, volume: 0.5 },
+        2: { file: AUDIO_FILES.wrong, volume: 0.5 },
+        3: { file: AUDIO_FILES.victory, volume: 0.7 }
+    };
+
+    const sound = sounds[type];
+    if (!sound) return;
+
+    playAudio(sound.file, sound.volume);
+}
+
+function playSound(type) {
+    if (type === undefined || type === null || type === "") return;
+    if (soundEnabled) {
+        playEffectSound(type);
+        return;
+    }
+
+    const musicAudio = getAudio(AUDIO_FILES.music);
+    const wasMusicPlaying = musicAudio && !musicAudio.paused;
+
+    if (wasMusicPlaying) {
+        stopBackgroundMusic();
+    }
+
+    playEffectSound(type);
+
+    if (wasMusicPlaying) {
+        setTimeout(() => {
+            if (soundEnabled) {
+                playBackgroundMusic();
+            }
+        }, 150);
+    }
+}
+
 const LS = {
     xp: "mm_xp",
     level: "mm_level",
@@ -33,6 +182,22 @@ let state = {
     timerId: null,
     timeLeft: 300
 };
+
+let audioContext = null;
+
+function getAudioContext() {
+    if (!audioContext) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return null;
+        audioContext = new AudioCtx();
+    }
+
+    if (audioContext.state === "suspended") {
+        audioContext.resume().catch(() => { });
+    }
+
+    return audioContext;
+}
 
 // ----------------------------
 // STORAGE HELPERS
@@ -259,6 +424,8 @@ function dailyChallenge() {
 }
 
 function finishDailyChallenge() {
+    playSound(3);
+
     let lives = get(LS.lives, 0);
     let gems = get(LS.gems, 0);
     let rewardXP = state.dailyMistakes === 0 ? 30 : 10;
@@ -283,17 +450,27 @@ function finishDailyChallenge() {
 }
 
 function finishLesson() {
+    playSound(3);
+
     const totalXPGained = state.combo * 3 + 10;
+
+    // Dá 50 gemas ao concluir a lição
+    let gems = get(LS.gems, 0);
+    set(LS.gems, gems + 50);
+
     app.innerHTML = `
         <div class="game">
             <h2>🎉 Lição Concluída!</h2>
             <div class="stat-row"><span>Melhor Combo</span><span>🔥 x${state.bestCombo}</span></div>
             <div class="stat-row"><span>XP Total</span><span>${totalXPGained}</span></div>
+            <div class="stat-row"><span>💎 Gemas Ganhas</span><span>+50</span></div>
+            <div class="stat-row"><span>Gemas Totais</span><span>💎 ${get(LS.gems, 0)}</span></div>
             <div class="stat-row"><span>Vidas Restantes</span><span>❤️ ${get(LS.lives, 5)}</span></div>
             <p>Continue praticando e melhorando seu combo!</p>
             <button onclick="home()">Voltar ao Início</button>
         </div>
     `;
+
     state.combo = 0;
     state.bestCombo = 0;
 }
@@ -372,13 +549,12 @@ const lessons = {
     decimal: {
         title: "Sistema Decimal", q: [
             { q: "No número 14582, qual é o valor do algarismo 4?", a: "4000" },
-            { q: "No número 15756, qual é o valor do algarismo 7?", a: "7000" },
+            { q: "No número 15756, qual é o valor do algarismo 7?", a: "700" },
             { q: "No número 15268, qual é o valor do algarismo 1?", a: "10000" },
             { q: "No número 5894, qual é o valor do algarismo 5?", a: "5000" },
             { q: "Qual número decimal equivale a fração 1/4?", a: "0,25" },
             { q: "Qual número decimal equivale a fração 3/5?", a: "0,6" },
             { q: "Qual número decimal equivale a fração 7/8?", a: "0,875" },
-            { q: "O que é uma dízima periódica?", a: "É um número decimal que possui um ou mais algarismos que se repetem infinitamente." }
         ]
     },
 
@@ -390,9 +566,9 @@ const lessons = {
             { q: "3/8 + 2/8 = ?", a: "5/8" },
             { q: "5/6 + 1/6 = ?", a: "1" },
             { q: "1/2 + 1/4 = ?", a: "3/4" },
-            { q: "2/3 + 5/6 = ? (use fração imprópria)", a: "3/2" },
+            { q: "2/3 + 5/6 = ? (use fração imprópria)", a: "6/9" },
             { q: "7/10 - 3/10 = ?", a: "4/10" },
-            { q: "5/6 - 1/3 = ?", a: "1/2" },
+            { q: "5/6 - 1/3 = ?", a: "3/6" },
             { q: "7/8 - 1/4 = ?", a: "5/8" }
 
         ]
@@ -410,6 +586,7 @@ function home() {
     app.innerHTML = `
         <div class="home">
             <h1>🧮 MathMaster</h1>
+            <button id="sound-toggle" onclick="toggleSound()" aria-pressed="${soundEnabled}">${soundEnabled ? "🔊 Som: ligado" : "🔇 Som: desligado"}</button>
             <p>XP: ${get(LS.xp, 0)} | Level: ${get(LS.level, 1)} | ❤️ ${get(LS.lives, 5)} | 🔥 ${get(LS.streak, 1)} | 💎 ${get(LS.gems, 0)}</p>
             <div class="progress-bar" title="${progress.xpInLevel}/${progress.xpToNext} XP para o próximo nível">
                 <div class="progress-fill" style="width: ${progress.percent}%;"></div>
@@ -517,6 +694,7 @@ function resolveAnswer(correct, timedOut = false) {
     let fb = document.getElementById("fb");
 
     if (correct) {
+        playSound(1);
         state.combo += 1;
         state.bestCombo = Math.max(state.bestCombo, state.combo);
         addXP(10 + (state.combo - 1) * 3);
@@ -541,6 +719,7 @@ function resolveAnswer(correct, timedOut = false) {
         return;
     }
 
+    playSound(2);
     state.combo = 0;
     recordAnswer(false);
     if (state.lesson === "practice") {
@@ -641,5 +820,9 @@ function shuffle(arr) {
 }
 
 // Inicialização do jogo
+soundEnabled = getStoredSoundState();
+if (!soundEnabled) {
+    stopBackgroundMusic();
+}
 initPlayer();
 home();
