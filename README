@@ -3,7 +3,6 @@
 Math Master Evolution é um jogo educativo em navegador, criado para ajudar alunos a praticar matemática de forma divertida, com desafios, recompensas e evolução de nível.
 
 ## Regras do jogo
-
 1. O jogador começa com 5 vidas.
 2. Cada questão respondida corretamente gera XP.
 3. O XP faz o jogador subir de nível.
@@ -15,20 +14,3 @@ Math Master Evolution é um jogo educativo em navegador, criado para ajudar alun
 9. As gemas podem ser usadas na loja para comprar recargas de 5 vidas.
 10. A recarga de 5 vidas custa 50 gemas.
 11. O jogo também possui combo, cronômetro, progresso de XP e estatísticas do jogador.
-
-## Como jogar
-
-- Abra o jogo no navegador.
-- Escolha uma lição.
-- Responda as perguntas escrevendo a resposta correta.
-- Acompanhe o progresso, vidas, gemas e desafios no menu principal.
-
-## Como executar
-
-Você pode abrir o arquivo index.html diretamente no navegador ou usar um servidor simples com Python:
-
-```bash
-python main.py
-```
-
-Depois, abra o endereço mostrado no terminal.
