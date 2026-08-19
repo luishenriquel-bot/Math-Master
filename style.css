@@ -1,4 +1,5 @@
 :root {
+    /* ==================== COLORS ==================== */
     --bg-deep: #020617;
     --bg-accent: #111c38;
     --bg-accent-2: #172554;
@@ -17,6 +18,36 @@
 
     --shadow: 0 30px 90px rgba(2, 6, 23, 0.45);
     --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.22);
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+
+    /* Border Radius */
+    --radius-sm: 12px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 30px;
+    --radius-full: 999px;
+
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-base: 0.25s ease;
+    --transition-slow: 0.4s ease;
+
+    /* Feedback colors - desaturated for consistency */
+    --success-light: rgba(34, 197, 94, 0.14);
+    --success-border: rgba(34, 197, 94, 0.25);
+    --success-text: #d1fae5;
+    --danger-light: rgba(239, 68, 68, 0.14);
+    --danger-border: rgba(239, 68, 68, 0.25);
+    --danger-text: #fee2e2;
+    --warning-light: rgba(239, 68, 68, 0.2);
+    --warning-border: rgba(239, 68, 68, 0.4);
+    --warning-text: #fecaca;
 }
 
 * {
@@ -24,6 +55,8 @@
     padding: 0;
     box-sizing: border-box;
     font-family: "Segoe UI", "Inter", Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -102,15 +135,25 @@ body::after {
     width: min(95%, 960px);
     position: relative;
     z-index: 10;
-    padding: clamp(24px, 4vw, 44px);
-    border-radius: 30px;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.06));
+    padding: clamp(var(--spacing-xl), 4vw, 44px);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.06));
     border: 1px solid var(--border);
     box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(26px);
     -webkit-backdrop-filter: blur(26px);
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     overflow: hidden;
+    isolation: isolate;
+}
+
+.app::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    pointer-events: none;
 }
 
 .app::before {
@@ -165,6 +208,10 @@ body::after {
     font-weight: 800;
     letter-spacing: -0.03em;
     text-shadow: 0 0 22px rgba(255, 255, 255, 0.18);
+    background: linear-gradient(135deg, #ffffff, #9ec5ff 45%, #c4b5fd 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .home p,
@@ -194,15 +241,18 @@ body::after {
 
 input {
     width: 100%;
-    padding: 15px 16px;
+    padding: 15px var(--spacing-lg);
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     font-size: 1rem;
     background: rgba(6, 12, 30, 0.72);
     color: var(--text);
     outline: none;
-    transition: 0.25s ease;
+    transition: var(--transition-base);
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 input:focus {
@@ -220,16 +270,19 @@ button {
     border: none;
     cursor: pointer;
     padding: 14px 18px;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     font-size: 1rem;
     font-weight: 700;
     color: var(--text);
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
     box-shadow: 0 12px 26px rgba(96, 165, 250, 0.25);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
     position: relative;
     overflow: hidden;
     letter-spacing: 0.01em;
+    min-height: 50px;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 button::after {
@@ -286,11 +339,11 @@ button:disabled {
     align-items: center;
     gap: 18px;
     padding: 18px 20px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
     border: 1px solid var(--border);
     color: var(--text);
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
     box-shadow: var(--shadow-soft);
 }
 
@@ -322,19 +375,19 @@ button:disabled {
 .progress-bar {
     width: 100%;
     height: 14px;
-    border-radius: 999px;
+    border-radius: var(--radius-full);
     background: rgba(255, 255, 255, 0.12);
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    margin: 0 auto 8px;
+    margin: 0 auto var(--spacing-sm);
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.16);
 }
 
 .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--accent-3), var(--accent), var(--accent-2));
-    border-radius: 999px;
-    transition: width 0.4s ease;
+    border-radius: var(--radius-full);
+    transition: width var(--transition-slow);
     box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.25);
 }
 
@@ -395,9 +448,9 @@ img {
 
 #question-timer.warning {
     animation: timerWarning 0.6s ease infinite;
-    background: rgba(239, 68, 68, 0.2);
-    border-color: rgba(239, 68, 68, 0.4);
-    color: #fecaca;
+    background: var(--warning-light);
+    border-color: var(--warning-border);
+    color: var(--warning-text);
 }
 
 @keyframes timerWarning {
@@ -477,18 +530,22 @@ img {
 }
 
 #fb {
-    margin-top: 12px;
+    margin-top: var(--spacing-md);
     text-align: center;
     font-size: 1.02rem;
     font-weight: 700;
     color: var(--text);
-    padding: 14px 16px;
-    border-radius: 14px;
+    padding: 14px var(--spacing-lg);
+    border-radius: var(--radius-md);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
     border: 1px solid rgba(255, 255, 255, 0.12);
-    transition: 0.3s ease;
+    transition: var(--transition-base);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
     animation: fbPop 0.3s ease;
+    min-height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 @keyframes fbPop {
@@ -504,15 +561,15 @@ img {
 }
 
 #fb.correct {
-    background: rgba(34, 197, 94, 0.14);
-    border-color: rgba(34, 197, 94, 0.25);
-    color: #d1fae5;
+    background: var(--success-light);
+    border-color: var(--success-border);
+    color: var(--success-text);
 }
 
 #fb.wrong {
-    background: rgba(239, 68, 68, 0.14);
-    border-color: rgba(239, 68, 68, 0.25);
-    color: #fee2e2;
+    background: var(--danger-light);
+    border-color: var(--danger-border);
+    color: var(--danger-text);
 }
 
 #fb .fb-actions {
@@ -525,8 +582,8 @@ img {
 
 #fb .fb-actions button {
     width: min(180px, 100%);
-    padding: 12px 14px;
-    border-radius: 12px;
+    padding: var(--spacing-md) 14px;
+    border-radius: var(--radius-sm);
     font-size: 0.95rem;
     box-shadow: 0 7px 18px rgba(0, 0, 0, 0.2);
 }
@@ -556,35 +613,101 @@ img {
 }
 
 @media (max-width: 480px) {
+    body {
+        padding: var(--spacing-lg);
+    }
+
     .app {
         padding: 20px;
         border-radius: 22px;
     }
 
+    button {
+        padding: var(--spacing-md) 14px;
+    }
+
     #fb .fb-actions {
         flex-direction: column;
-        gap: 10px;
+        gap: var(--spacing-sm);
     }
 
     #fb .fb-actions button {
         width: 100%;
     }
 
-    .question-meta-row {
-        flex-direction: column;
-        gap: 8px;
-    }
-
     input {
-        padding: 12px 14px;
+        padding: var(--spacing-md) 14px;
         font-size: 16px;
     }
 }
 
+/* Otimizações de performance e acessibilidade */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+    }
+
+    body::before,
+    body::after {
+        animation: none !important;
+    }
+
+    .app::before,
+    button::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Melhorias para telas pequenas */
+@media (max-width: 640px) {
+    body {
+        min-height: auto;
+        padding: var(--spacing-lg);
+    }
+
+    .app {
+        width: 100%;
+        border-radius: var(--radius-lg);
+    }
+
+    .home h1,
+    .game h2 {
+        font-size: 1.75rem;
+    }
+
+    button {
+        min-height: 48px;
+        font-size: 0.95rem;
+    }
+
+    input {
+        font-size: 16px;
+        /* Previne zoom em inputs */
+    }
+}
+
+/* Dark mode suporte (se o sistema usar) */
+@media (prefers-color-scheme: dark) {
+    body {
+        background:
+            radial-gradient(circle at top left, rgba(96, 165, 250, 0.15), transparent 30%),
+            radial-gradient(circle at bottom right, rgba(192, 132, 252, 0.15), transparent 32%),
+            linear-gradient(135deg, var(--bg-deep), var(--bg-accent), var(--bg-accent-2));
+    }
+}
+
+/* Suporte para telas de alta densidade (retina) */
+@media (-webkit-min-device-pixel-ratio: 2) {
+
+    body::before,
+    body::after {
+        filter: blur(12px);
+    }
+
+    .app::before {
+        filter: blur(8px);
     }
 }
