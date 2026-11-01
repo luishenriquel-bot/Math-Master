@@ -10,6 +10,7 @@
 - The workflow runs `python -u main.py` from the project root.
 - The server listens on `0.0.0.0:5000`; open Replit's Preview to play.
 - Player progress is stored in the browser's local storage, not on the server.
+- The sample progress JSON files attached for reference are not app data and must not be copied into the app or loaded automatically. Progress JSON is generated only when a player chooses to export it.
 
 ## Known limitation
 The imported repository does not include the audio files referenced in

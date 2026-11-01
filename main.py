@@ -1,9 +1,24 @@
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import unquote, urlsplit
 
 HOST = "0.0.0.0"
 PORT = 5000
 
+
 class MeuHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        requested_path = unquote(urlsplit(self.path).path)
+        normalized_path = "/" + "/".join(
+            part for part in requested_path.split("/") if part not in ("", ".", "..")
+        )
+        if normalized_path == "/attached_assets" or normalized_path.startswith("/attached_assets/"):
+            self.send_error(404)
+            return
+
+        if normalized_path == "/":
+            self.path = "/index.html"
+        super().do_GET()
+
     def log_message(self, format, *args):
         print(f"[Servidor] {self.address_string()} - {format % args}")
 
